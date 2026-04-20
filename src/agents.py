@@ -433,6 +433,29 @@ class SearchService:
         query = (query or "").strip()
         if not query:
             return []
+            
+        import os
+        pexels_key = os.environ.get("PEXELS_API_KEY")
+        if pexels_key:
+            import requests
+            try:
+                headers = {"Authorization": pexels_key}
+                url = f"https://api.pexels.com/v1/search?query={query}&per_page={max_results}"
+                resp = requests.get(url, headers=headers, timeout=5)
+                resp.raise_for_status()
+                data = resp.json()
+                results = []
+                for photo in data.get("photos", []):
+                    results.append({
+                        "title": photo.get("alt", f"{query} photo"),
+                        "image_url": photo["src"]["landscape"],
+                        "source": "Pexels"
+                    })
+                if results:
+                    return dedupe_by_key(results, "image_url")
+            except Exception as e:
+                print(f"Pexels search failed, falling back to DDG: {e}")
+
         try:
             with DDGS() as ddgs:
                 results = list(
