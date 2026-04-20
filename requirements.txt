@@ -1,12 +1,13 @@
 flask
-crewai
+crewai==1.9.3
 chromadb
-langgraph
+langgraph==1.1.8
 python-dotenv
 duckduckgo-search
 groq
 requests
-pydantic
+pydantic==2.11.10
 markdown
 gunicorn
 edge-tts
+litellm==1.81.5
