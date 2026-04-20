@@ -1,0 +1,12 @@
+flask
+crewai
+chromadb
+langgraph
+python-dotenv
+duckduckgo-search
+groq
+requests
+pydantic
+markdown
+gunicorn
+edge-tts

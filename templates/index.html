@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI Newsroom</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="page-shell">
+    <section class="hero">
+      <p class="eyebrow">AI Newsroom</p>
+      <h1>Three agents, one publishable report.</h1>
+      <p class="hero-copy">
+        Research, image curation, and long-form writing work together to build a richer report
+        with source links and embedded visuals.
+      </p>
+    </section>
+
+    <section class="panel input-panel">
+      <form id="news-form" method="post">
+        <label for="topic">Enter your topic</label>
+        <div class="form-row">
+          <input
+            id="topic"
+            name="topic"
+            type="text"
+            placeholder="AI agents in medical field recent developments"
+            value="{{ topic }}"
+            required
+          >
+          <button type="submit" id="submit-btn">Generate Report</button>
+        </div>
+        
+        <div class="audio-options" style="margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--line);">
+          <label style="margin-bottom: 12px; font-size: 1rem;">Select Audio Briefing Length:</label>
+          <div style="display: flex; gap: 24px;">
+            <label style="font-weight: 500; font-size: 0.95rem; display: flex; align-items: center; gap: 8px; cursor: pointer;">
+              <input type="radio" name="audio_option" value="short" style="width: 18px; height: 18px; padding: 0; margin: 0; box-shadow: none;"> Short (Overview Only)
+            </label>
+            <label style="font-weight: 500; font-size: 0.95rem; display: flex; align-items: center; gap: 8px; cursor: pointer;">
+              <input type="radio" name="audio_option" value="brief" checked style="width: 18px; height: 18px; padding: 0; margin: 0; box-shadow: none;"> Brief (Top Findings)
+            </label>
+            <label style="font-weight: 500; font-size: 0.95rem; display: flex; align-items: center; gap: 8px; cursor: pointer;">
+              <input type="radio" name="audio_option" value="detailed" style="width: 18px; height: 18px; padding: 0; margin: 0; box-shadow: none;"> Detailed (Full Analysis)
+            </label>
+          </div>
+        </div>
+      </form>
+      <div id="loading-overlay">
+        <div class="spinner"></div>
+        <p class="loading-text">Agents are researching, writing, and editing...</p>
+      </div>
+      {% if error %}
+        <div class="alert error">{{ error }}</div>
+      {% endif %}
+    </section>
+
+  </div>
+  <script>
+    document.getElementById('news-form').addEventListener('submit', function(e) {
+      if (!document.getElementById('topic').value.trim()) return;
+      document.getElementById('submit-btn').style.display = 'none';
+      document.getElementById('loading-overlay').style.display = 'block';
+    });
+  </script>
+</body>
+</html>

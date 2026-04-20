@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Report: {{ topic }} - AI Newsroom</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    .back-btn {
+      display: inline-block;
+      margin-bottom: 24px;
+      color: #93c5fd;
+      text-decoration: none;
+      font-weight: 700;
+      transition: color 0.2s;
+    }
+    .back-btn:hover {
+      color: #bfdbfe;
+    }
+    .meta-heading {
+      margin-top: 60px;
+      margin-bottom: 20px;
+      font-family: "Instrument Serif", serif;
+      font-size: 2rem;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="page-shell">
+    <a href="/" class="back-btn">&larr; Back to Search</a>
+    
+    <section class="panel report-panel" style="margin-top: 0;">
+      <div class="section-head">
+        <h2>Generated Report</h2>
+      </div>
+      
+      {% if result.audio_filename %}
+      <div class="audio-player-container">
+        <p class="audio-label">Listen to the Executive Audio Briefing</p>
+        <audio controls class="custom-audio">
+          <source src="{{ url_for('static', filename=result.audio_filename) }}" type="audio/mpeg">
+          Your browser does not support the audio element.
+        </audio>
+      </div>
+      {% endif %}
+
+      <article class="report-body">{{ result.report_html | safe }}</article>
+    </section>
+
+    <h2 class="meta-heading">Research & Workflow Metadata</h2>
+
+    <section class="panel summary-grid">
+      <div>
+        <p class="section-label">Topic overview</p>
+        <p>{{ result.research_overview }}</p>
+      </div>
+      <div>
+        <p class="section-label">Recommended angle</p>
+        <p>{{ result.recommended_angle }}</p>
+      </div>
+      <div>
+        <p class="section-label">Image query</p>
+        <p>{{ result.image_query }}</p>
+      </div>
+    </section>
+
+    <section class="panel summary-grid">
+      <div>
+        <p class="section-label">Editorial verdict</p>
+        <p>{{ result.editorial_review.verdict }}</p>
+      </div>
+      <div>
+        <p class="section-label">Confidence score</p>
+        <p>{{ result.editorial_review.confidence_score }}</p>
+      </div>
+      <div>
+        <p class="section-label">Citation coverage</p>
+        <p>{{ result.editorial_review.citation_coverage }}</p>
+      </div>
+    </section>
+
+    {% if result.editorial_review.issues %}
+      <section class="panel">
+        <div class="section-head">
+          <h2>Editor notes</h2>
+        </div>
+        <div class="bullet-list">
+          {% for issue in result.editorial_review.issues %}
+            <p>• {{ issue }}</p>
+          {% endfor %}
+        </div>
+      </section>
+    {% endif %}
+
+
+
+    <section class="panel">
+      <div class="section-head">
+        <h2>Curated visuals</h2>
+      </div>
+      <div class="image-grid">
+        {% for image in result.images %}
+          <article class="image-card">
+            <img src="{{ image.image_url }}" alt="{{ image.caption }}">
+            <div class="image-meta">
+              <h3>{{ image.caption }}</h3>
+              <p>{{ image.placement_hint }}</p>
+              <a href="{{ image.source_page }}" target="_blank" rel="noreferrer">
+                {{ image.attribution }}
+              </a>
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="section-head">
+        <h2>Sources</h2>
+      </div>
+      <div class="source-list">
+        {% for source in result.sources %}
+          <a class="source-item" href="{{ source.url }}" target="_blank" rel="noreferrer">
+            <strong>{{ source.title }}</strong>
+            <span>{{ source.publisher }}</span>
+          </a>
+        {% endfor %}
+      </div>
+    </section>
+  </div>
+</body>
+</html>
