@@ -56,17 +56,41 @@ def _patch_crewai_storage(storage_root: Path):
         storage_root.mkdir(parents=True, exist_ok=True)
         return str(storage_root)
 
-    from crewai.events.listeners.tracing import utils as tracing_utils
-    from crewai.flow.persistence import sqlite as flow_sqlite
-    from crewai.memory.storage import kickoff_task_outputs_storage, ltm_sqlite_storage, rag_storage
-    from crewai.utilities import paths
+    try:
+        from crewai.utilities import paths
+        paths.db_storage_path = _storage_path
+    except ImportError:
+        pass
 
-    paths.db_storage_path = _storage_path
-    tracing_utils.db_storage_path = _storage_path
-    flow_sqlite.db_storage_path = _storage_path
-    kickoff_task_outputs_storage.db_storage_path = _storage_path
-    ltm_sqlite_storage.db_storage_path = _storage_path
-    rag_storage.db_storage_path = _storage_path
+    try:
+        from crewai.events.listeners.tracing import utils as tracing_utils
+        tracing_utils.db_storage_path = _storage_path
+    except ImportError:
+        pass
+
+    try:
+        from crewai.flow.persistence import sqlite as flow_sqlite
+        flow_sqlite.db_storage_path = _storage_path
+    except ImportError:
+        pass
+
+    try:
+        from crewai.memory.storage import kickoff_task_outputs_storage
+        kickoff_task_outputs_storage.db_storage_path = _storage_path
+    except ImportError:
+        pass
+
+    try:
+        from crewai.memory.storage import ltm_sqlite_storage
+        ltm_sqlite_storage.db_storage_path = _storage_path
+    except ImportError:
+        pass
+
+    try:
+        from crewai.memory.storage import rag_storage
+        rag_storage.db_storage_path = _storage_path
+    except ImportError:
+        pass
 
 
 def safe_domain(url: str) -> str:
