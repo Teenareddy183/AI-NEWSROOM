@@ -132,15 +132,24 @@ def trim_text(value: str, limit: int = 280) -> str:
 
 def normalize_research_payload(payload: dict[str, Any], topic: str, search_results: list[dict[str, Any]]):
     payload = payload or {}
-    payload.setdefault(
-        "topic_overview",
-        f"{topic} is the focus of this newsroom brief based on current search results and prior memory.",
-    )
-    payload.setdefault(
-        "recommended_angle",
-        f"A source-backed report on recent developments, context, and why {topic} matters now.",
-    )
-    payload.setdefault("image_query", topic)
+    
+    for key in ["topic_overview", "recommended_angle", "image_query"]:
+        val = payload.get(key)
+        if isinstance(val, dict):
+            payload[key] = val.get("detail", val.get("title", str(val)))
+        elif isinstance(val, list):
+            payload[key] = ", ".join(str(v) for v in val)
+        elif val is not None:
+            payload[key] = str(val)
+            
+    if not payload.get("topic_overview"):
+        payload["topic_overview"] = f"{topic} is the focus of this newsroom brief based on current search results and prior memory."
+        
+    if not payload.get("recommended_angle"):
+        payload["recommended_angle"] = f"A source-backed report on recent developments, context, and why {topic} matters now."
+        
+    if not payload.get("image_query"):
+        payload["image_query"] = topic
 
     sources = payload.get("sources") if isinstance(payload.get("sources"), list) else []
     findings = payload.get("key_findings") if isinstance(payload.get("key_findings"), list) else []
@@ -390,6 +399,9 @@ def normalize_editorial_payload(payload: dict[str, Any]) -> dict[str, Any]:
 
 class SearchService:
     def web_search(self, query: str, max_results: int = 8) -> list[dict[str, Any]]:
+        query = (query or "").strip()
+        if not query:
+            return []
         try:
             with DDGS() as ddgs:
                 results = list(ddgs.text(query, max_results=max_results))
@@ -418,6 +430,9 @@ class SearchService:
         return dedupe_by_key(formatted, "url")
 
     def image_search(self, query: str, max_results: int = 8) -> list[dict[str, Any]]:
+        query = (query or "").strip()
+        if not query:
+            return []
         try:
             with DDGS() as ddgs:
                 results = list(
