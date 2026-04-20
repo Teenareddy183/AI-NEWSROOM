@@ -89,6 +89,9 @@ def build_news_graph(project_root: Path):
         }
 
     def run_research(state: NewsState) -> NewsState:
+        if not state.get("search_results"):
+            raise ValueError("Cloud provider IP blocked by search engine. The AI has no news to read and cannot generate a factual report. Please deploy locally or use a paid search API.")
+            
         research = newsroom.run_research(
             state["topic"],
             state.get("search_results", []),
